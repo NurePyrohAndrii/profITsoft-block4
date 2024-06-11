@@ -4,6 +4,7 @@ import config from './config';
 import log4js, { Configuration } from 'log4js';
 import mongoose, { ConnectOptions } from 'mongoose';
 import Consul, { ConsulOptions } from 'consul';
+import {connectProducer} from "./clients/kafkaClient";
 
 type EnvType = 'dev' | 'prod';
 
@@ -54,7 +55,8 @@ export default async () => {
 
   const port = await getConsulValue(`${env}/port`) as number;
   const address = await getConsulValue(`${env}/address`) as string;
-  app.listen(port, address, () => {
+  app.listen(port, address, async () => {
+    await connectProducer();
     log4js.getLogger().info(`Flights Statuses app listening on port ${address}:${port}`);
   });
 
@@ -64,6 +66,7 @@ export default async () => {
     useUnifiedTopology: true,
     socketTimeoutMS: 30000,
   } as ConnectOptions);
+
 
   return app;
 };

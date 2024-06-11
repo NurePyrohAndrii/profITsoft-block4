@@ -1,4 +1,4 @@
-const FLIGHTS_SERVICE_URL = 'http://localhost:8080/api/flights';
+const FLIGHTS_SERVICE_URL = 'http://block2-flight-service:8181/api/flights';
 
 export const existsByFlightId = async (
   id: string

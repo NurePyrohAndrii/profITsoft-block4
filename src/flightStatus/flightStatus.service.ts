@@ -2,6 +2,7 @@ import FlightStatus, {IFlightStatus, Status} from "src/flightStatus/flightStatus
 import {FlightStatusSaveDto} from "src/flightStatus/dto/FlightStatusSaveDto";
 import {existsByFlightId} from "src/clients/flightsServiceClient";
 import {FlightStatusInfoDto} from "src/flightStatus/dto/FlightStatusInfoDto";
+import {sendEmailMessage} from "src/clients/kafkaClient";
 
 /**
  * Create flight status with given flight status dto
@@ -13,6 +14,20 @@ export const createFlightStatus = async (
 ): Promise<string> => {
   await validateFlightStatus(flightStatusDto);
   const flightStatus = await new FlightStatus(flightStatusDto).save();
+
+  // Construct the Kafka message
+  const kafkaMessage = {
+    subject: 'Flight Status Created',
+    text: `Flight status with id ${flightStatus._id} has been created.
+    Flight id: ${flightStatus.flightId}.\n
+    Status: ${flightStatus.status}.\n
+    Timestamp: ${flightStatus.timestamp}.`,
+    recipient: '',
+  };
+
+  // Send the message to the Kafka topic
+  await sendEmailMessage('mail', kafkaMessage);
+
   return flightStatus._id;
 };
 
