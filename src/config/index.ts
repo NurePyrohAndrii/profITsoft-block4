@@ -14,6 +14,9 @@ const config = {
       name: 'nodejs-sample',
     },
   },
+  flight_service: {
+    url: 'http://block2-flight-service:8181/api/flights',
+  },
   log4js: {
     appenders: {
       console: {
